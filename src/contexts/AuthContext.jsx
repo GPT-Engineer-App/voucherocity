@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { sendEmailVerification } from '../utils/auth';
+import { sendEmailVerification } from '@/utils/auth';
 
 const AuthContext = createContext();
 
