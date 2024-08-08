@@ -1,17 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import VoucherConversion from '../components/VoucherConversion';
+import { useQuery } from '@tanstack/react-query';
 
-const dummyVouchers = [
-  { id: 1, code: 'ABC123', value: 100, status: 'Active', bank: 'Standard Chartered' },
-  { id: 2, code: 'DEF456', value: 200, status: 'Used', bank: 'NatWest Group' },
-  { id: 3, code: 'GHI789', value: 150, status: 'Expired', bank: 'UniCredit' },
-];
+const fetchVouchers = async () => {
+  // Simulated API call
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return [
+    { id: 1, code: 'ABC123', value: 100, currency: 'USD', status: 'Active', bank: 'Standard Chartered' },
+    { id: 2, code: 'DEF456', value: 200, currency: 'EUR', status: 'Active', bank: 'NatWest Group' },
+    { id: 3, code: 'GHI789', value: 150, currency: 'GBP', status: 'Active', bank: 'UniCredit' },
+  ];
+};
 
 const Vouchers = () => {
   const [selectedVoucher, setSelectedVoucher] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const { data: vouchers, isLoading, error } = useQuery({
+    queryKey: ['vouchers'],
+    queryFn: fetchVouchers,
+  });
+
+  const filteredVouchers = vouchers?.filter(voucher =>
+    voucher.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    voucher.bank.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <div>
@@ -20,7 +39,12 @@ const Vouchers = () => {
         <Button>Create Voucher</Button>
       </div>
       <div className="mb-4">
-        <Input placeholder="Search vouchers..." className="max-w-sm" />
+        <Input 
+          placeholder="Search vouchers..." 
+          className="max-w-sm" 
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </div>
       <Table>
         <TableHeader>
@@ -28,17 +52,19 @@ const Vouchers = () => {
             <TableHead>ID</TableHead>
             <TableHead>Code</TableHead>
             <TableHead>Value</TableHead>
+            <TableHead>Currency</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Bank</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {dummyVouchers.map((voucher) => (
+          {filteredVouchers.map((voucher) => (
             <TableRow key={voucher.id}>
               <TableCell>{voucher.id}</TableCell>
               <TableCell>{voucher.code}</TableCell>
-              <TableCell>${voucher.value}</TableCell>
+              <TableCell>{voucher.value}</TableCell>
+              <TableCell>{voucher.currency}</TableCell>
               <TableCell>{voucher.status}</TableCell>
               <TableCell>{voucher.bank}</TableCell>
               <TableCell>

@@ -1,4 +1,4 @@
-import { Home, CreditCard, BarChart, Settings as SettingsIcon, HelpCircle, Users, FileText } from "lucide-react";
+import { Home, CreditCard, BarChart, Settings as SettingsIcon, HelpCircle, Users, FileText, History } from "lucide-react";
 import Dashboard from "./pages/Dashboard";
 import Vouchers from "./pages/Vouchers";
 import Analytics from "./pages/Analytics";
@@ -6,6 +6,7 @@ import Settings from "./pages/Settings";
 import Support from "./pages/Support";
 import UsersManagement from "./pages/UsersManagement";
 import BankPartnersManagement from "./pages/BankPartnersManagement";
+import TransactionHistory from "./pages/TransactionHistory";
 
 export const navItems = [
   {
@@ -20,6 +21,13 @@ export const navItems = [
     to: "/vouchers",
     icon: <CreditCard className="h-4 w-4" />,
     page: <Vouchers />,
+    roles: ['user', 'admin'],
+  },
+  {
+    title: "Transaction History",
+    to: "/transactions",
+    icon: <History className="h-4 w-4" />,
+    page: <TransactionHistory />,
     roles: ['user', 'admin'],
   },
   {
