@@ -9,6 +9,7 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [mfaRequired, setMfaRequired] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,6 +24,13 @@ export const AuthProvider = ({ children }) => {
     try {
       // Simulating API call
       await new Promise(resolve => setTimeout(resolve, 1000));
+      // Check if MFA is required (this would be determined by your backend)
+      const mfaRequired = Math.random() < 0.5; // 50% chance for demo purposes
+      if (mfaRequired) {
+        setMfaRequired(true);
+        navigate('/mfa-verification');
+        return;
+      }
       const userData = { id: '1', name: 'John Doe', email, role: 'user' };
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
@@ -54,8 +62,24 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const verifyMFA = async (code) => {
+    try {
+      // Simulating API call to verify MFA code
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Assuming the code is correct for demo purposes
+      const userData = { id: '1', name: 'John Doe', email: 'john@example.com', role: 'user' };
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+      setMfaRequired(false);
+      toast.success('MFA verified successfully');
+      navigate('/');
+    } catch (error) {
+      toast.error('MFA verification failed');
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, register, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, register, loading, mfaRequired, verifyMFA }}>
       {children}
     </AuthContext.Provider>
   );
