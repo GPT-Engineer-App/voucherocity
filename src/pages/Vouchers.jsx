@@ -4,8 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import VoucherConversion from '../components/VoucherConversion';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useBankPartners } from '../contexts/BankPartnersContext';
+import toast from 'react-hot-toast';
 
 const fetchVouchers = async () => {
   // Simulated API call
@@ -24,12 +26,13 @@ const createVoucher = async (voucherData) => {
 };
 
 const Vouchers = () => {
-  const [selectedVoucher, setSelectedVoucher] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [newVoucher, setNewVoucher] = useState({ code: '', value: '', currency: 'USD', bank: '' });
+  const [conversionVoucher, setConversionVoucher] = useState({ code: '', value: '', fromCurrency: 'USD', toCurrency: 'USD', fromBank: '', toBank: '' });
 
   const queryClient = useQueryClient();
+  const { bankPartners } = useBankPartners();
 
   const { data: vouchers, isLoading, error } = useQuery({
     queryKey: ['vouchers'],
@@ -45,6 +48,19 @@ const Vouchers = () => {
     },
   });
 
+  const convertVoucherMutation = useMutation({
+    mutationFn: async (voucherData) => {
+      // Simulated API call for voucher conversion
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return { ...voucherData, status: 'Converted' };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries(['vouchers']);
+      setConversionVoucher({ code: '', value: '', fromCurrency: 'USD', toCurrency: 'USD', fromBank: '', toBank: '' });
+      toast.success('Voucher converted successfully');
+    },
+  });
+
   const filteredVouchers = vouchers?.filter(voucher =>
     voucher.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
     voucher.bank.toLowerCase().includes(searchTerm.toLowerCase())
@@ -52,6 +68,10 @@ const Vouchers = () => {
 
   const handleCreateVoucher = () => {
     createVoucherMutation.mutate(newVoucher);
+  };
+
+  const handleConvertVoucher = () => {
+    convertVoucherMutation.mutate(conversionVoucher);
   };
 
   if (isLoading) return <div>Loading...</div>;
@@ -63,6 +83,69 @@ const Vouchers = () => {
         <h2 className="text-2xl font-bold">Vouchers</h2>
         <Button onClick={() => setIsCreateDialogOpen(true)}>Create Voucher</Button>
       </div>
+      
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Quick Voucher Conversion</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-4">
+            <Input 
+              placeholder="Voucher Code" 
+              value={conversionVoucher.code}
+              onChange={(e) => setConversionVoucher({...conversionVoucher, code: e.target.value})}
+            />
+            <Input 
+              type="number" 
+              placeholder="Value" 
+              value={conversionVoucher.value}
+              onChange={(e) => setConversionVoucher({...conversionVoucher, value: e.target.value})}
+            />
+            <Select value={conversionVoucher.fromCurrency} onValueChange={(value) => setConversionVoucher({...conversionVoucher, fromCurrency: value})}>
+              <SelectTrigger>
+                <SelectValue placeholder="From Currency" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="USD">USD</SelectItem>
+                <SelectItem value="EUR">EUR</SelectItem>
+                <SelectItem value="GBP">GBP</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={conversionVoucher.toCurrency} onValueChange={(value) => setConversionVoucher({...conversionVoucher, toCurrency: value})}>
+              <SelectTrigger>
+                <SelectValue placeholder="To Currency" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="USD">USD</SelectItem>
+                <SelectItem value="EUR">EUR</SelectItem>
+                <SelectItem value="GBP">GBP</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={conversionVoucher.fromBank} onValueChange={(value) => setConversionVoucher({...conversionVoucher, fromBank: value})}>
+              <SelectTrigger>
+                <SelectValue placeholder="From Bank" />
+              </SelectTrigger>
+              <SelectContent>
+                {bankPartners.map((bank) => (
+                  <SelectItem key={bank} value={bank}>{bank}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={conversionVoucher.toBank} onValueChange={(value) => setConversionVoucher({...conversionVoucher, toBank: value})}>
+              <SelectTrigger>
+                <SelectValue placeholder="To Bank" />
+              </SelectTrigger>
+              <SelectContent>
+                {bankPartners.map((bank) => (
+                  <SelectItem key={bank} value={bank}>{bank}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <Button className="mt-4 w-full" onClick={handleConvertVoucher}>Convert Voucher</Button>
+        </CardContent>
+      </Card>
+
       <div className="mb-4">
         <Input 
           placeholder="Search vouchers..." 
@@ -80,7 +163,6 @@ const Vouchers = () => {
             <TableHead>Currency</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Bank</TableHead>
-            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -92,20 +174,11 @@ const Vouchers = () => {
               <TableCell>{voucher.currency}</TableCell>
               <TableCell>{voucher.status}</TableCell>
               <TableCell>{voucher.bank}</TableCell>
-              <TableCell>
-                <Button variant="outline" size="sm" className="mr-2" onClick={() => setSelectedVoucher(voucher)}>Convert</Button>
-                <Button variant="outline" size="sm">View</Button>
-              </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      {selectedVoucher && (
-        <VoucherConversion
-          voucher={selectedVoucher}
-          onClose={() => setSelectedVoucher(null)}
-        />
-      )}
+      
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -135,7 +208,16 @@ const Vouchers = () => {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <label htmlFor="bank" className="text-right">Bank</label>
-              <Input id="bank" value={newVoucher.bank} onChange={(e) => setNewVoucher({...newVoucher, bank: e.target.value})} className="col-span-3" />
+              <Select value={newVoucher.bank} onValueChange={(value) => setNewVoucher({...newVoucher, bank: value})}>
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select bank" />
+                </SelectTrigger>
+                <SelectContent>
+                  {bankPartners.map((bank) => (
+                    <SelectItem key={bank} value={bank}>{bank}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <DialogFooter>
