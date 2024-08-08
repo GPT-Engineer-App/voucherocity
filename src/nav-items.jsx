@@ -1,4 +1,4 @@
-import { Home, CreditCard, BarChart, Settings, HelpCircle } from "lucide-react";
+import { Home, CreditCard, BarChart, Settings as SettingsIcon, HelpCircle } from "lucide-react";
 import Dashboard from "./pages/Dashboard";
 import Vouchers from "./pages/Vouchers";
 import Analytics from "./pages/Analytics";
@@ -27,7 +27,7 @@ export const navItems = [
   {
     title: "Settings",
     to: "/settings",
-    icon: <Settings className="h-4 w-4" />,
+    icon: <SettingsIcon className="h-4 w-4" />,
     page: <Settings />,
   },
   {
