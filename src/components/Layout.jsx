@@ -1,9 +1,20 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import Sidebar from './Sidebar';
 import Header from './Header';
 
 const Layout = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
