@@ -17,6 +17,7 @@ import Layout from './components/Layout';
 import UsersManagement from './pages/UsersManagement';
 import BankPartnersManagement from './pages/BankPartnersManagement';
 import MFAVerification from './pages/MFAVerification';
+import EmailVerification from './pages/EmailVerification';
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => {
               <Route path="/register" element={<Register />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/mfa-verification" element={<MFAVerification />} />
+              <Route path="/email-verification" element={<EmailVerification />} />
               <Route path="/" element={<Layout />}>
                 <Route index element={<Dashboard />} />
                 <Route path="vouchers" element={<Vouchers />} />

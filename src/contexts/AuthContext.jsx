@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { sendEmailVerification } from '../utils/auth';
 
 const AuthContext = createContext();
 
@@ -52,13 +53,28 @@ export const AuthProvider = ({ children }) => {
     try {
       // Simulating API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      const userData = { id: '2', name, email, role: 'user' };
+      const userData = { id: '2', name, email, role: 'user', emailVerified: false };
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
-      toast.success('Registered successfully');
-      navigate('/');
+      await sendEmailVerification(email);
+      toast.success('Registered successfully. Please check your email to verify your account.');
+      navigate('/email-verification');
     } catch (error) {
       toast.error('Registration failed');
+    }
+  };
+
+  const verifyEmail = async (token) => {
+    try {
+      // Simulating API call to verify email
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const updatedUser = { ...user, emailVerified: true };
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      toast.success('Email verified successfully');
+      navigate('/');
+    } catch (error) {
+      toast.error('Email verification failed');
     }
   };
 

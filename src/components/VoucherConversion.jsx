@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { sendTransactionNotification } from '../utils/notifications';
 
 const fetchBankPartners = async () => {
   // Simulated API call
@@ -31,6 +32,13 @@ const convertVoucher = async ({ voucherCode, targetBank }) => {
   if (Math.random() < 0.1) { // 10% chance of error
     throw new Error("Conversion failed. Please try again.");
   }
+  const transaction = { 
+    status: 'success', 
+    amount: voucher.value, 
+    fromCurrency: voucher.currency, 
+    toCurrency: 'USD' // Assuming conversion to USD for simplicity
+  };
+  sendTransactionNotification(transaction);
   return { success: true, message: "Voucher converted successfully" };
 };
 
