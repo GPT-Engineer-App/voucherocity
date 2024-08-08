@@ -1,14 +1,39 @@
-import { Home } from "lucide-react";
-import Index from "./pages/Index.jsx";
+import { Home, CreditCard, BarChart, Settings, HelpCircle } from "lucide-react";
+import Dashboard from "./pages/Dashboard";
+import Vouchers from "./pages/Vouchers";
+import Analytics from "./pages/Analytics";
+import Settings from "./pages/Settings";
+import Support from "./pages/Support";
 
-/**
- * Central place for defining the navigation items. Used for navigation components and routing.
- */
 export const navItems = [
   {
-    title: "Home",
+    title: "Dashboard",
     to: "/",
     icon: <Home className="h-4 w-4" />,
-    page: <Index />,
+    page: <Dashboard />,
+  },
+  {
+    title: "Vouchers",
+    to: "/vouchers",
+    icon: <CreditCard className="h-4 w-4" />,
+    page: <Vouchers />,
+  },
+  {
+    title: "Analytics",
+    to: "/analytics",
+    icon: <BarChart className="h-4 w-4" />,
+    page: <Analytics />,
+  },
+  {
+    title: "Settings",
+    to: "/settings",
+    icon: <Settings className="h-4 w-4" />,
+    page: <Settings />,
+  },
+  {
+    title: "Support",
+    to: "/support",
+    icon: <HelpCircle className="h-4 w-4" />,
+    page: <Support />,
   },
 ];
