@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
+import { BankPartnersProvider } from './contexts/BankPartnersContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -24,24 +25,26 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <Router>
         <AuthProvider>
-          <Toaster position="top-right" />
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/mfa-verification" element={<MFAVerification />} />
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="vouchers" element={<Vouchers />} />
-              <Route path="analytics" element={<Analytics />} />
-              <Route path="settings" element={<Settings />} />
-              <Route path="support" element={<Support />} />
-              <Route path="admin" element={<AdminDashboard />} />
-              <Route path="admin/users" element={<UsersManagement />} />
-              <Route path="admin/bank-partners" element={<BankPartnersManagement />} />
-            </Route>
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <BankPartnersProvider>
+            <Toaster position="top-right" />
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/mfa-verification" element={<MFAVerification />} />
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Dashboard />} />
+                <Route path="vouchers" element={<Vouchers />} />
+                <Route path="analytics" element={<Analytics />} />
+                <Route path="settings" element={<Settings />} />
+                <Route path="support" element={<Support />} />
+                <Route path="admin" element={<AdminDashboard />} />
+                <Route path="admin/users" element={<UsersManagement />} />
+                <Route path="admin/bank-partners" element={<BankPartnersManagement />} />
+              </Route>
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </BankPartnersProvider>
         </AuthProvider>
       </Router>
     </QueryClientProvider>
